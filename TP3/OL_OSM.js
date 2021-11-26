@@ -4,35 +4,8 @@
 var map = new ol.Map({
     target: 'map',
     layers: [new ol.layer.Tile({source: new ol.source.OSM()})],
-    view: new ol.View({center: ol.proj.fromLonLat([3.87667,43.6111]), zoom: 15})
+    view: new ol.View({center: ol.proj.fromLonLat([3.87667, 43.6111]), zoom: 12})
 });
-
-// var globale contenant les marqueurs
-var mesMarkers = [];
-var popups = [];
-
-
-function creationOverlay(pi, numPi){
-    let image = $("#markerProto").clone();
-    image.attr("id", "marker"+numPi);
-    $("body").append(image);
-    mesMarkers.push(new ol.Overlay({position: ol.proj.fromLonLat([pi.long, pi.lat]),
-        positioning: 'center-center',
-        element: document.getElementById("marker"+numPi)})
-    );
-    map.addOverlay(mesMarkers[numPi]); // positionner sur la map
-	console.log("génération du marker "+numPi+" effectuée");
-    mesMarkers[numPi].getElement().style.display='block';
-}
-
-
-function creationPopup(pi, numPi){
-    let popup = $("#popupProto").clone();
-    popup.attr("id", "popup"+numPi);
-    popup.append("<div style='background-color:white'><p>"+pi.nom+"</p></div>");
-    $("body").append(popup);
-    popups.push()
-}
 
 
 
@@ -108,8 +81,8 @@ $().ready(function(){
                 let html = "<h3>"+type+"</h3>\n<div id='"+type+"'>\n";
                 for(let obj2 of data1){
                     html += "<input type='checkbox' name='"+numero+"'>"+obj2.name+"\n";
-                    creationOverlay();
-                    creationPopup();
+                    creationOverlay(obj2, numero);
+                    creationPopup(obj2, numero);
                     numero++;
                 }
                 html += "</div>";
@@ -124,10 +97,40 @@ $().ready(function(){
         }
     });
 });
+// var globale contenant les marqueurs et les popups
+var mesMarkers = [];
+var popups = [];
+
+
+function creationOverlay(pi, numPi){
+    let image = $("#markerProto").clone();
+    image.attr("id", "marker"+numPi);
+    $("body").append(image);
+    mesMarkers.push(new ol.Overlay({position: ol.proj.fromLonLat([pi.long, pi.lat]),
+        positioning: 'center-center',
+        element: document.getElementById("marker"+numPi)})
+    );
+    map.addOverlay(mesMarkers[numPi]); // positionner sur la map
+	console.log("génération du marker "+numPi+" effectuée");
+    mesMarkers[numPi].getElement().style.display='block';
+}
+
+
+function creationPopup(pi, numPi){
+    let popup = $("#popupProto").clone();
+    popup.attr("id", "popup"+numPi);
+    popup.append("<div style='background-color:white'><p>"+pi.nom+"</p></div>");
+    $("body").append(popup);
+    popups.push(new ol.Overlay({position: ol.proj.fromLonLat([pi.long, pi.lat]),
+        positioning: 'center-center',
+        offset: [30, -50],
+        element: document.getElementById("marker"+numPi)}));
+    map.addOverlay(popup[numPi]);
+}
 
 
 // que faire quand on coche une checkbox
-$('body').on("change", "input[type=checkbox]", function() {
+/*$('body').on("change", "input[type=checkbox]", function() {
     let  valeur = $(this).attr('name');
     console.log("sélection de la case à cocher numéro : "+valeur);
     if ($(this).is(':checked')) {
@@ -137,4 +140,11 @@ $('body').on("change", "input[type=checkbox]", function() {
     else {
         mesMarkers[valeur].getElement().style.display='none'; // effacer
     }
+});*/
+
+$('body').on("click", "img", function() {
+    console.log("Click sur "+$(this).attr('id'));
+    let arr = $(this).attr('id').match("/marker(.*/)");
+    let popup = document.getElementById("popup"+arr[1]);
+    popup.style.display == "none" ? popup.style.display = "block" : popup.style.display = "none";
 });
