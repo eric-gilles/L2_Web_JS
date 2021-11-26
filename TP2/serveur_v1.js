@@ -18,6 +18,8 @@ app.get('/fichier/:nomFichier', function(request, response) {
 })
 
 app.get('/cocktails/:nomJD', function(request, response){
+    response.setHeader('Content-Type', 'application/json');
+    response.setHeader("Access-Control-Allow-Origin", '*');
     let texte = fs.readFileSync("cocktails.json", "utf8");
     let data = JSON.parse(texte);
     let cocktails = [];
